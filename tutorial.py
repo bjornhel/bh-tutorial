@@ -4,15 +4,14 @@ import pydicom as dcm   # Importer modulen som heter pydicom og kall den dcm i k
 import numpy as np   # Numpy er den viktigste modulen for vitenskaplig python. Da får man tilgang til en numpy array som brukes til bilder, matriser ++
 import pandas as pd  # Her får man tilgang til en pd.DaataFrame som brukes til å holde på tabeller med data av forskjellig type. F.eks data importert fra excel.
 import matplotlib.pyplot as plt  # Dette brukes mye til å plotte data.
-import matplotlib as mpl  # alternativ måte å importere matplotlib på. Her importerer man flere biblioteker enn pyplot. Man kan nå samme funksjoner som over ved å skrive mål.pyplot osv...
-from matplotlib import pyplot as plt  # Alternativ måte å importere pyplotmodulen og kalle den plt.
-import cv2
+# import matplotlib as mpl  # alternativ måte å importere matplotlib på. Her importerer man flere biblioteker enn pyplot. Man kan nå samme funksjoner som over ved å skrive mål.pyplot osv...
+# from matplotlib import pyplot as plt  # Alternativ måte å importere pyplotmodulen og kalle den plt.
+import cv2  # Dette er et bibliotek for computer vision
 
 
-def read_img_np(path, file):
+def read_img_np():
     "This function reads a 16 bit uint 512, 512 image"
-    tp = path + '\\' + file
-    pixels = np.fromfile(tp, dtype='uint16')
+    pixels = np.fromfile('Data\\NE_1.raw', dtype='uint16')
     im = pixels.reshape(512,512)
     return im
 
@@ -55,9 +54,7 @@ def draw_lines(lines, img, show=False):
     return line_coords
 
 def main2():
-    path = 'C:\BHdata\Duke\Duke-ideal-edge-slit-images'
-    file = 'NIS_1.raw'
-    im = read_img_np(path, file)
+    im = read_img_np()
     im8 = conv_16_8bit(im) # Convert images to 8 bit for edge detection.
     edges = cv2.Canny(im8, im8.min(), im8.max(), apertureSize=3)  # Find the edges in the image.
     lines = cv2.HoughLines(edges, 1, np.pi/1800, 100)
@@ -68,6 +65,12 @@ def main2():
     plt.show()
 
 def main():
+    met = dcm.read_file('Data\\IM32', stop_before_pixels=True) # Les DICOM Metadata
+    dicom_file = dcm.dcmread('Data\\IM32')
+    im = dicom_file.pixel_array + met.RescaleIntercept
+    plt.imshow(im, cmap='gray', vmin=-30, vmax=30)  # Lag plottet (men ikke vis det enda).
+    plt.show()  # Vis plottet
+
 
 
 
